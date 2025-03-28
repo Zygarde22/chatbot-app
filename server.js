@@ -1,18 +1,14 @@
+require("dotenv").config();
 const express = require("express");
-const CONFIG = require("./config.js"); // Import the config file
+const cors = require("cors");
 
 const app = express();
-const port = 3000;
-
+app.use(cors());
 app.use(express.json());
 
 app.post("/get-api-key", (req, res) => {
-    if (!CONFIG.API_KEY) {
-        return res.status(500).json({ error: "API key not found" });
-    }
-    res.json({ message: CONFIG.API_KEY });
+    res.json({ message: process.env.GEMINI_API_KEY });
 });
 
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-});
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
