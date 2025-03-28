@@ -1,10 +1,23 @@
-import CONFIG from "./config.js"; // Import API key from config.js
-
 document.addEventListener("DOMContentLoaded", loadChatHistory);
 
 const chatContainer = document.getElementById("chat-container");
 const userInput = document.getElementById("user-input");
 const sendButton = document.getElementById("send-button");
+
+async function fetchApiKey() {
+    try {
+        const response = await fetch("http://localhost:3000/get-api-key", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+        });
+
+        const data = await response.json();
+        return data.apiKey; // Make sure your backend sends { apiKey: "your-key" }
+    } catch (error) {
+        console.error("Error fetching API key:", error);
+        return null;
+    }
+}
 
 async function sendMessage() {
     const userMessage = userInput.value.trim();
@@ -13,7 +26,8 @@ async function sendMessage() {
     displayMessage(userMessage, "user");
     userInput.value = "";
 
-    if (!CONFIG.API_KEY) {
+    const apiKey = await fetchApiKey(); // Fetch API key from backend
+    if (!apiKey) {
         displayMessage("Error: API key not available.", "bot");
         return;
     }
@@ -25,7 +39,7 @@ async function sendMessage() {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${CONFIG.API_KEY}`, // Using imported API key
+                "Authorization": `Bearer ${apiKey}`, // Use fetched API key
             },
             body: JSON.stringify({ message: userMessage }),
         });
@@ -42,17 +56,8 @@ async function sendMessage() {
         displayMessage("Error: Unable to connect to chatbot.", "bot");
     }
 }
-async function fetchApiKey() {
-    try {
-        const response = await fetch("http://localhost:3000/get-api-key", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-        });
 
-        const data = await response.json();
-        return data.apiKey; // Corrected from "message" to "apiKey"
-    } catch (error) {
-        console.error("Error fetching API key:", error);
-        return null;
-    }
-}
+sendButton.addEventListener("click", sendMessage);
+userInput.addEventListener("keypress", (event) => {
+    if (event.key === "Enter") sendMessage();
+});
