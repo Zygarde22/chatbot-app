@@ -12,7 +12,7 @@ async function fetchApiKey() {
         });
 
         const data = await response.json();
-        return data.apiKey; // Make sure your backend sends { apiKey: "your-key" }
+        return data.apiKey;  
     } catch (error) {
         console.error("Error fetching API key:", error);
         return null;
@@ -21,12 +21,17 @@ async function fetchApiKey() {
 
 async function sendMessage() {
     const userMessage = userInput.value.trim();
-    if (!userMessage) return; // Ignore empty messages
+    if (!userMessage) {
+        console.log("User message is empty");  // Debugging
+        return; // Ignore empty messages
+    }
 
     displayMessage(userMessage, "user");
     userInput.value = "";
 
     const apiKey = await fetchApiKey(); // Fetch API key from backend
+    console.log("API Key:", apiKey);  // Debugging
+
     if (!apiKey) {
         displayMessage("Error: API key not available.", "bot");
         return;
@@ -46,6 +51,7 @@ async function sendMessage() {
 
         const data = await response.json();
         removeTypingIndicator();
+        console.log("Bot response:", data);  // Debugging
         displayMessage(data.response, "bot");
 
         saveMessage(userMessage, "user");
