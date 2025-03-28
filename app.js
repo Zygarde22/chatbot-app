@@ -42,3 +42,17 @@ async function sendMessage() {
         displayMessage("Error: Unable to connect to chatbot.", "bot");
     }
 }
+async function fetchApiKey() {
+    try {
+        const response = await fetch("http://localhost:3000/get-api-key", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+        });
+
+        const data = await response.json();
+        return data.apiKey; // Corrected from "message" to "apiKey"
+    } catch (error) {
+        console.error("Error fetching API key:", error);
+        return null;
+    }
+}
