@@ -12,3 +12,7 @@ app.post("/get-api-key", (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+if (!process.env.GEMINI_API_KEY) {
+    console.error("API key is missing in .env file.");
+    process.exit(1); // Exit the process if API key is not found
+}
