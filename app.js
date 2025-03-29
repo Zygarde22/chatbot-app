@@ -13,7 +13,7 @@ async function sendMessage() {
     displayTypingIndicator(); // Show "typing..." before response
 
     try {
-        const response = await fetch("https://your-chatbot-api.com/send", {
+        const response = await fetch("https://your-chatbot-api.com/send", {  // Replace this with the actual API URL
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
