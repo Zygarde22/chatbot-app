@@ -1,41 +1,14 @@
-document.addEventListener("DOMContentLoaded", loadChatHistory);
-
-const chatContainer = document.getElementById("chat-container");
-const userInput = document.getElementById("user-input");
-const sendButton = document.getElementById("send-button");
-
-async function fetchApiKey() {
-    try {
-        const response = await fetch("http://localhost:3000/get-api-key", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-        });
-
-        const data = await response.json();
-        return data.apiKey;  
-    } catch (error) {
-        console.error("Error fetching API key:", error);
-        return null;
-    }
-}
+const apiKey = "AIzaSyBWL9Qo2PyLwC6arEDcV4jD-V3dhNn7GVM";  //Yes I know this isn't safe, I've given up trying to get this to all run and doing this via render is making my head hurt.
 
 async function sendMessage() {
     const userMessage = userInput.value.trim();
     if (!userMessage) {
-        console.log("User message is empty");  // Debugging
-        return; // Ignore empty messages
+        console.log("User message is empty");
+        return;
     }
 
     displayMessage(userMessage, "user");
     userInput.value = "";
-
-    const apiKey = await fetchApiKey(); // Fetch API key from backend
-    console.log("API Key:", apiKey);  // Debugging
-
-    if (!apiKey) {
-        displayMessage("Error: API key not available.", "bot");
-        return;
-    }
 
     displayTypingIndicator(); // Show "typing..." before response
 
@@ -44,14 +17,14 @@ async function sendMessage() {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${apiKey}`, // Use fetched API key
+                "Authorization": `Bearer ${apiKey}`,  // Use the embedded API key
             },
             body: JSON.stringify({ message: userMessage }),
         });
 
         const data = await response.json();
         removeTypingIndicator();
-        console.log("Bot response:", data);  // Debugging
+        console.log("Bot response:", data);
         displayMessage(data.response, "bot");
 
         saveMessage(userMessage, "user");
@@ -62,8 +35,3 @@ async function sendMessage() {
         displayMessage("Error: Unable to connect to chatbot.", "bot");
     }
 }
-
-sendButton.addEventListener("click", sendMessage);
-userInput.addEventListener("keypress", (event) => {
-    if (event.key === "Enter") sendMessage();
-});
