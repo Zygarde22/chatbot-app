@@ -1,40 +1,31 @@
 const express = require("express");
-const { OpenAI } = require("openai");
-const dotenv = require("dotenv");
-
-dotenv.config(); // Load API key from .env file
-
+const OpenAI = require("openai");
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY, // Use the key from .env file
+const client = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY, // Use an environment variable for security
 });
 
 app.use(express.json());
 
-// Endpoint to handle chat requests
+// POST endpoint to handle chatbot interactions
 app.post("/chat", async (req, res) => {
-    const userInput = req.body.message;
-
-    if (!userInput) {
-        return res.status(400).send("No message provided.");
-    }
+    const { message } = req.body;
 
     try {
-        const response = await openai.completions.create({
+        const response = await client.responses.create({
             model: "gpt-4o",
-            prompt: userInput,
-            max_tokens: 150,
+            input: message,
         });
 
-        res.json({ message: response.choices[0].text.trim() });
+        res.json({ message: response.output_text });
     } catch (error) {
-        res.status(500).send("Error communicating with OpenAI API.");
+        console.error("Error with OpenAI API:", error);
+        res.status(500).json({ message: "Error with the chatbot." });
     }
 });
 
 app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
+    console.log(`Server is running on port ${port}`);
 });
