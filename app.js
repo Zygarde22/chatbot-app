@@ -3,12 +3,10 @@
 import OpenAI from "openai";
 const client = new OpenAI();
 
-const response = await client.responses.create({
-    model: "gpt-4o",
-    input: "talk to user",
-});
-
-console.log(response.output_text);
+// Get DOM elements
+const chatContainer = document.getElementById("chat-container");
+const sendButton = document.getElementById("send-button");
+const userInput = document.getElementById("user-input");
 
 // Function to send a message and display it in the chat
 async function sendMessage() {
