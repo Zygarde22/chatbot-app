@@ -1,16 +1,14 @@
 "use strict";
 
-require('dotenv').config();
-
-
+require("dotenv").config();
 const express = require("express");
-const OpenAI = require("openai");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+
 const app = express();
 const port = process.env.PORT || 3000;
 
-const client = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY, // Use an environment variable for security
-});
+// Initialize Google Gemini AI Client
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 app.use(express.json());
 
@@ -19,14 +17,16 @@ app.post("/chat", async (req, res) => {
     const { message } = req.body;
 
     try {
-        const response = await client.responses.create({
-            model: "gpt-4o",
-            input: message,
-        });
+        // Choose a Gemini model (e.g., gemini-pro)
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-        res.json({ message: response.output_text });
+        // Get AI response
+        const result = await model.generateContent(message);
+        const responseText = result.response.candidates[0]?.content.parts[0]?.text || "I didn't understand that.";
+
+        res.json({ message: responseText });
     } catch (error) {
-        console.error("Error with OpenAI API:", error);
+        console.error("Error with Gemini API:", error);
         res.status(500).json({ message: "Error with the chatbot." });
     }
 });
